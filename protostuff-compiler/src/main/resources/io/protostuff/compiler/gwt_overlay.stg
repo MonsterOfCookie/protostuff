@@ -169,6 +169,10 @@ public <if(nested)>static <endif>final class <message.name> extends JavaScriptOb
     <message:message_constructor(message=it, options=options)>
 
     <message:message_getters_and_setters(message=it, options=options)>
+
+    <if(message.proto.extraOptions.java_model_package)>
+    <message:message_conversion(message=it, options=options)>
+    <endif>
 }
 
 >>
@@ -378,6 +382,76 @@ protected <message.name>() {}
 message_getters_and_setters(message, options) ::= <<
 // getters and setters
 <message.fields:field_getters_and_setters(field=it, options=options)>
+>>
+
+message_conversion(message, options) ::= <<
+
+public <message.proto.extraOptions.java_model_package><message.name> toModel() {
+
+    <message.proto.extraOptions.java_model_package><message.name> rtn = new <message.proto.extraOptions.java_model_package><message.name>();
+    <message.fields:field_conversion_to_model(field=it, options=options)>
+    return rtn;
+}
+
+public static <message.name> fromModel(<message.proto.extraOptions.java_model_package><message.name> model) {
+
+    <message.name> rtn =  <message.name>.create();
+    <message.fields:field_conversion_from_model(field=it, options=options)>
+    return rtn;
+}
+
+>>
+
+field_conversion_to_model(field, options) ::= <<
+<if(field.messageField)>
+
+<if(field.repeated)>
+for (int i = 0; i \< get<field.name; format="PC">Array().length(); i++) {
+    rtn.get<field.name; format="PC">().add(get<field.name; format="PC">Array().get(i).toModel());
+}
+
+<else>
+rtn.set<field.name; format="PC">(get<field.name; format="PC">().toModel());
+<endif>
+
+<else>
+
+<if(field.repeated)>
+// TO IMPLEMENT
+
+<else>
+rtn.set<field.name; format="PC">((<field.javaType>)get<field.name; format="PC">());
+
+<endif>
+
+<endif>
+>>
+
+field_conversion_from_model(field, options) ::= <<
+<if(field.messageField)>
+
+<if(field.repeated)>
+<map_repeated_prefix.(field.class.simpleName)><map_repeated_value.(field.javaType)><map_repeated_suffix.(field.class.simpleName)> <field.name>Array = <field.javaType; format="PC">.createArray();
+for (<message.proto.extraOptions.java_model_package><field.javaType> m : model.get<field.name; format="PC">()) {
+    <field.name>Array.push(<field.javaType>.fromModel(m));
+}
+
+rtn.set<field.name; format="PC">Array(<field.name>Array);
+
+<else>
+rtn.set<field.name; format="PC">(<field.name; format="PC">.fromModel(model.get<field.name; format="PC">()));
+<endif>
+
+<else>
+
+<if(field.repeated)>
+// TO IMPLEMENT
+
+<else>
+rtn.set<field.name; format="PC">((<map_singular_value.(field.javaType)>)model.get<field.name; format="PC">());
+<endif>
+
+<endif>
 >>
 
 field_getters_and_setters(field, options) ::= <<
