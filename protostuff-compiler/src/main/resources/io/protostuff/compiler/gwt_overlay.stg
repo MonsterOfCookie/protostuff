@@ -417,7 +417,10 @@ rtn.set<field.name; format="PC">(get<field.name; format="PC">().toModel());
 <else>
 
 <if(field.repeated)>
-// TO IMPLEMENT
+// POTENTIAL OTHER ISSUES WITH OTHER FIELDS
+for (int i = 0; i \< get<field.name; format="PC">Array().length(); i++) {
+    rtn.get<field.name; format="PC">().add(get<field.name; format="PC">Array().get(i));
+}
 
 <else>
 rtn.set<field.name; format="PC">((<field.javaType>)get<field.name; format="PC">());
