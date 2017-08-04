@@ -257,9 +257,32 @@ public final class JsonInput implements Input
     }
 
     @Override
+    public void readBytes(final ByteBuffer bb) throws IOException
+    {
+        bb.put(parser.getBinaryValue());
+
+        if (lastRepeated && parser.nextToken() == END_ARRAY)
+            lastRepeated = false;
+    }
+
+    @Override
     public double readDouble() throws IOException
     {
-        final double value = parser.getDoubleValue();
+        final double value;
+        if (parser.getCurrentToken() == VALUE_STRING)
+        {
+            final String textValue = parser.getText();
+
+            if ("Infinity".equals(textValue))
+                value = Double.POSITIVE_INFINITY;
+            else if ("-Infinity".equals(textValue))
+                    value = Double.NEGATIVE_INFINITY;
+            else if ("NaN".equals(textValue))
+                value = Double.NaN;
+            else
+                value = parser.getDoubleValue();
+        } else
+            value = parser.getDoubleValue();
 
         if (lastRepeated && parser.nextToken() == END_ARRAY)
             lastRepeated = false;
@@ -306,7 +329,21 @@ public final class JsonInput implements Input
     @Override
     public float readFloat() throws IOException
     {
-        final float value = parser.getFloatValue();
+        final float value;
+        if (parser.getCurrentToken() == VALUE_STRING)
+        {
+            final String textValue = parser.getText();
+
+            if ("Infinity".equals(textValue))
+                value = Float.POSITIVE_INFINITY;
+            else if ("-Infinity".equals(textValue))
+                    value = Float.NEGATIVE_INFINITY;
+            else if ("NaN".equals(textValue))
+                value = Float.NaN;
+            else
+                value = parser.getFloatValue();
+        } else
+            value = parser.getFloatValue();
 
         if (lastRepeated && parser.nextToken() == END_ARRAY)
             lastRepeated = false;
