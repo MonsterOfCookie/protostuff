@@ -406,22 +406,24 @@ field_conversion_to_model(field, options) ::= <<
 <if(field.messageField)>
 
 <if(field.repeated)>
-for (int i = 0; i \< get<field.name; format="PC">Array().length(); i++) {
-    rtn.get<field.name; format="PC">().add(get<field.name; format="PC">Array().get(i).toModel());
+if (get<field.name; format="PC">Array() != null) {
+    for (int i = 0; i \< get<field.name; format="PC">Array().length(); i++) {
+        rtn.get<field.name; format="PC">().add(get<field.name; format="PC">Array().get(i).toModel());
+    }
 }
-
 <else>
-rtn.set<field.name; format="PC">(get<field.name; format="PC">().toModel());
+if (get<field.name; format="PC">() != null) {
+    rtn.set<field.name; format="PC">(get<field.name; format="PC">().toModel());
+}
 <endif>
-
 <else>
-
 <if(field.repeated)>
-// POTENTIAL OTHER ISSUES WITH OTHER FIELDS
-for (int i = 0; i \< get<field.name; format="PC">Array().length(); i++) {
-    rtn.get<field.name; format="PC">().add(get<field.name; format="PC">Array().get(i));
+// Array Conversion
+if (get<field.name; format="PC">Array() != null) {
+    for (int i = 0; i \< get<field.name; format="PC">Array().length(); i++) {
+        rtn.get<field.name; format="PC">().add((<field.javaType>)get<field.name; format="PC">Array().get(i));
+    }
 }
-
 <else>
 rtn.set<field.name; format="PC">((<field.javaType>)get<field.name; format="PC">());
 
@@ -448,7 +450,7 @@ rtn.set<field.name; format="PC">(<field.name; format="PC">.fromModel(model.get<f
 <else>
 
 <if(field.repeated)>
-// TO IMPLEMENT
+// ARRAYS TO IMPLEMENT
 
 <else>
 rtn.set<field.name; format="PC">((<map_singular_value.(field.javaType)>)model.get<field.name; format="PC">());
