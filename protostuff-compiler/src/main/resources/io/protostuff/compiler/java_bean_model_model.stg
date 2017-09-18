@@ -5,6 +5,12 @@ message_block(message, module, options, nested) ::= <<
 <message:message_header(message=it, module=module, options=options)>
 <endif>
 
+import java.io.Externalizable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import io.protostuff.Message;
+import io.protostuff.GraphIOUtil;
+
 @Generated("<module.generator>")
 public <if(nested)>static <endif>class <remote_model_name(message=message, name=message.name, noprefix=1)>
        <options.(message.name + ".extends_model_declaration"); format=" ">
